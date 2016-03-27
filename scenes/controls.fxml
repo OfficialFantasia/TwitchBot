@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+
+<TabPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="227.0" prefWidth="354.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fantasia.controller.MainController">
+   <tabs>
+      <Tab text="Informations">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="21.0" layoutY="27.0" text="Title:" />
+                  <Label layoutX="21.0" layoutY="63.0" text="Game:" />
+                  <TextField fx:id="title" disable="true" layoutX="103.0" layoutY="23.0" prefHeight="25.0" prefWidth="208.0" />
+                  <TextField fx:id="game" disable="true" layoutX="103.0" layoutY="59.0" prefHeight="25.0" prefWidth="208.0" />
+                  <Label layoutX="21.0" layoutY="100.0" text="Viewers:" />
+                  <Label fx:id="viewers" layoutX="105.0" layoutY="100.0" text="0" />
+                  <ImageView fx:id="spinner" fitHeight="16.0" fitWidth="16.0" layoutX="13.0" layoutY="168.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@../res/spinner.gif" />
+                     </image>
+                  </ImageView>
+                  <Label fx:id="infoLabel" layoutX="37.0" layoutY="168.0" prefHeight="17.0" prefWidth="126.0" text="Updating Stream infos" visible="false" />
+                  <Label layoutX="22.0" layoutY="135.0" prefHeight="17.0" prefWidth="40.0" text="Status:" />
+                  <Label fx:id="streamStatus" layoutX="105.0" layoutY="135.0" text="Not live" />
+               </children>
+            </AnchorPane>
+        </content>
+      </Tab>
+      <Tab text="Controls">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="131.0" prefWidth="296.0">
+               <children>
+                  <Label fx:id="slowStatus" layoutX="151.0" layoutY="13.0" prefHeight="33.0" prefWidth="150.0" text="Slowmode is: off" />
+                  <ToggleButton fx:id="toggleSlow" disable="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="128.0" text="Toggle Slowmode" />
+                  <Label fx:id="subStatus" layoutX="151.0" layoutY="48.0" prefHeight="33.0" prefWidth="150.0" text="Submode is: off" />
+                  <ToggleButton fx:id="toggleSub" disable="true" layoutX="14.0" layoutY="49.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="128.0" text="Toggle Submode" />
+                  <TextField fx:id="timeoutInput" disable="true" layoutX="152.0" layoutY="87.0" />
+                  <TextField fx:id="banInput" disable="true" layoutX="152.0" layoutY="123.0" />
+                  <Button fx:id="timeout" disable="true" layoutX="14.0" layoutY="84.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="128.0" text="Timeout" />
+                  <Button fx:id="ban" disable="true" layoutX="14.0" layoutY="120.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="128.0" text="Ban" />
+                  <Button fx:id="unban" disable="true" layoutX="14.0" layoutY="156.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="128.0" text="Unban" />
+                  <TextField fx:id="unbanInput" disable="true" layoutX="152.0" layoutY="159.0" />
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+      <Tab text="Commands">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <Pane prefHeight="371.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <Button fx:id="addCommand" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="128.0" text="Add Command" />
+                        <ListView fx:id="commandList" layoutX="14.0" layoutY="57.0" prefHeight="127.0" prefWidth="266.0" />
+                        <Button fx:id="deleteCommand" layoutX="288.0" layoutY="159.0" mnemonicParsing="false" text="Delete" />
+                        <Button fx:id="editCommand" layoutX="288.0" layoutY="127.0" mnemonicParsing="false" text="Edit" />
+                        <Button fx:id="saveCommands" layoutX="147.0" layoutY="14.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="128.0" text="Save Commands" />
+                        <Button fx:id="exportCommands" layoutX="288.0" layoutY="89.0" mnemonicParsing="false" text="Export" />
+                        <Button fx:id="importCommands" layoutX="288.0" layoutY="57.0" mnemonicParsing="false" text="Import" />
+                     </children>
+                  </Pane>
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+      <Tab text="Options">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <CheckBox fx:id="autoSave" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Enable  Autosaving" />
+                  <CheckBox fx:id="autoLogin" layoutX="14.0" layoutY="39.0" mnemonicParsing="false" text="Enable  Autologin" />
+                  <Button fx:id="saveOptions" layoutX="14.0" layoutY="151.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="128.0" text="Save" />
+                  <ComboBox fx:id="timezoneSelect" layoutX="14.0" layoutY="65.0" prefWidth="150.0" />
+                  <Label layoutX="177.0" layoutY="69.0" text="Preview:" />
+                  <Label fx:id="preview" layoutX="227.0" layoutY="69.0" prefHeight="17.0" prefWidth="123.0" text="22.03.1999 13:37" />
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+   </tabs>
+</TabPane>
