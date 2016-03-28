@@ -86,7 +86,7 @@ public class Context {
     }
 
     public long getUptimeHours(){
-        return Hours.hoursBetween(date.minusHours(Math.toIntExact(TimeUnit.MILLISECONDS.toHours(DateTimeZone.forID("Etc/"+timezone).getOffset(date)))),DateTime.now()).getHours();
+        return Hours.hoursBetween(date,DateTime.now().minusHours(Math.toIntExact(TimeUnit.MILLISECONDS.toHours(DateTimeZone.UTC.getOffset(DateTime.now()))))).getHours();
     }
 
     public long getUptimeMinutes(){
