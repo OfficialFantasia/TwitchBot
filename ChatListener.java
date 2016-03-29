@@ -1,7 +1,5 @@
 package com.fantasia;
 
-import java.util.concurrent.TimeUnit;
-
 public class ChatListener implements Runnable {
     @Override
     public void run() {
@@ -32,7 +30,12 @@ public class ChatListener implements Runnable {
                 sendMessage("Available Commands: " + response);
                 return;
             }
-            String response = Context.getInstance().getCommands().get(msg);
+            String arg = "";
+            if(getCommand(msg).contains("%ARG%")){
+                String[] temp = msg.split(" ");
+                arg = temp[1];
+            }
+            String response = Context.getInstance().getCommands().get(getCommand(msg));
             for(String c: Context.getInstance().getVars()){
                 if(response.contains(c)){
                     switch(c){
@@ -45,6 +48,9 @@ public class ChatListener implements Runnable {
                         case "%MINUTES%":
                             response = response.replaceAll(c,""+Context.getInstance().getUptimeMinutes());
                             break;
+                        case "%ARG%":
+                            response = response.replace(c,arg);
+                            break;
                         default:
                             break;
                     }
@@ -56,22 +62,34 @@ public class ChatListener implements Runnable {
 
     private boolean checkForCommand(String msg){
         if(!Context.getInstance().getCommands().isEmpty()){
-            if(Context.getInstance().getCommands().containsKey(msg)){
-                return true;
+            String[] temp = msg.split(" ");
+            if(temp.length>1){
+                if(Context.getInstance().getCommands().containsKey(temp[0]+" %ARG%")){
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
-                return false;
+                if(Context.getInstance().getCommands().containsKey(temp[0])){
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
         return false;
     }
 
-    /*public String getUptimeHours(){
-        return "" + TimeUnit.MILLISECONDS.toHours(Context.getInstance().getStarttime());
+    private String getCommand(String msg){
+        if(!Context.getInstance().getCommands().isEmpty()){
+            for(String c: Context.getInstance().getCommands().keySet()){
+                if(msg.contains(c.replace("%ARG%",""))){
+                    return c;
+                }
+            }
+        }
+        return "";
     }
-
-    public String getUptimeMinutes(){
-        return "" + (TimeUnit.MILLISECONDS.toMinutes(Context.getInstance().getStarttime()) - 60 * TimeUnit.MILLISECONDS.toHours(Context.getInstance().getStarttime()));
-    }*/
 
     public void sendMessage(String msg) throws Exception{
         Context.getInstance().getOutputStream().write("PRIVMSG #" + Context.getInstance().getChannel() + " :" + msg + " \r\n");
