@@ -6,7 +6,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -32,10 +31,11 @@ public class Context {
     private BufferedReader inputStream;
     private BufferedWriter outputStream;
     private HashMap<String, String> commands = new HashMap<>();
-    private String[] vars = {"%NICK%", "%HOURS%", "%MINUTES%"};
+    private String[] vars = {"%NICK%", "%HOURS%", "%MINUTES%", "%ARG%"};
     private boolean autoSaveEnabled,autoLoginEnabled,running,partner,live;
     private DateTime date;
     private Timer timer;
+    private final double VERSION = 1.2;
 
     public String getUsername(){
         return username;
@@ -121,6 +121,10 @@ public class Context {
         return game;
     }
 
+    public double getVERSION() {
+        return VERSION;
+    }
+
     public void setUsername(String username){
         this.username = username;
     }
@@ -200,7 +204,7 @@ public class Context {
         }
     }
 
-    public void switchTo(String destination,Pane root) throws IOException {
+    public void switchTo(String destination,Parent root) throws IOException {
         Parent channel = FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/" + destination + ".fxml"));
         Stage newStage = (Stage) root.getScene().getWindow();
         newStage.setScene(new Scene(channel,354,227));
