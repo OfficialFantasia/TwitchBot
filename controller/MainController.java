@@ -42,13 +42,11 @@ public class MainController implements Initializable{
     @FXML
     private ToggleButton toggleSlow,toggleSub;
     @FXML
-    private Label slowStatus,subStatus,infoLabel,streamStatus,viewers,preview;
+    private Label slowStatus,subStatus,infoLabel,streamStatus,viewers;
     @FXML
     private ImageView spinner;
     @FXML
     private TextField game,title,banInput,timeoutInput,unbanInput;
-    @FXML
-    private ComboBox<String> timezoneSelect;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -190,11 +188,6 @@ public class MainController implements Initializable{
                 }
             }
         });
-        timezoneSelect.valueProperty().addListener((observable, oldValue, newValue) -> {
-            SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-            format.setTimeZone(TimeZone.getTimeZone(newValue));
-            preview.setText(format.format(new Date()));
-        });
         //set tooltips
         Tooltip tip1 = new Tooltip();
         tip1.setText("When enabled the commands are saved automatically");
@@ -213,10 +206,6 @@ public class MainController implements Initializable{
         ObservableList<String> items;
         items = FXCollections.observableArrayList(Context.getInstance().getCommands().keySet());
         commandList.setItems(items);
-        String[] timezoneCodes = {"GMT+14","GMT+13","GMT+12","GMT+11","GMT+10","GMT+9","GMT+9","GMT+8","GMT+7","GMT+6","GMT+5","GMT+4","GMT+3","GMT+2","GMT+1","GMT","GMT-1","GMT-2","GMT-3","GMT-4","GMT-5","GMT-6","GMT-7","GMT-8","GMT-9","GMT-10","GMT-11","GMT-12"};
-        items = FXCollections.observableArrayList(Arrays.asList(timezoneCodes));
-        timezoneSelect.setItems(items);
-        timezoneSelect.getSelectionModel().select(Context.getInstance().getTimezone());
         //start timer for stream information
         Context.getInstance().startTimer(new TimerTask() {
             @Override
@@ -471,7 +460,6 @@ public class MainController implements Initializable{
                             Context.getInstance().setAutoSaveEnabled(false);
                             break;
                     }
-                    Context.getInstance().setTimezone(l.item(1).getTextContent());
                 }
                 if(list.item(i).getNodeName().equals("autologin")){
                     NodeList l = list.item(i).getChildNodes();
@@ -507,8 +495,6 @@ public class MainController implements Initializable{
                         l.item(0).setTextContent("0");
                         Context.getInstance().setAutoSaveEnabled(false);
                     }
-                    l.item(1).setTextContent(timezoneSelect.getSelectionModel().getSelectedItem());
-                    Context.getInstance().setTimezone(timezoneSelect.getSelectionModel().getSelectedItem());
                 } else if(list.item(i).getNodeName().equals("autologin")){
                     NodeList l = list.item(i).getChildNodes();
                     if(autoLogin.isSelected()){

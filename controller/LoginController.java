@@ -3,21 +3,15 @@ package com.fantasia.controller;
 import com.fantasia.Context;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,12 +21,11 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.awt.*;
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.Socket;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Base64;
 import java.util.ResourceBundle;
-import java.util.Scanner;
 
 public class LoginController implements Initializable{
 
@@ -235,9 +228,6 @@ public class LoginController implements Initializable{
         Element autosave = doc.createElement("autosave");
         autosave.appendChild(doc.createTextNode("0"));
         general.appendChild(autosave);
-        Element timezone = doc.createElement("timezone");
-        timezone.appendChild(doc.createTextNode("GMT"));
-        general.appendChild(timezone);
         root.appendChild(general);
         Element autologin = doc.createElement("autologin");
         Element enabled = doc.createElement("enabled");
