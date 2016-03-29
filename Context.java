@@ -86,7 +86,7 @@ public class Context {
     }
 
     public long getUptimeHours(){
-        return Hours.hoursBetween(date,DateTime.now()).getHours() - TimeUnit.MILLISECONDS.toHours(DateTimeZone.getDefault().getOffset(DateTime.now()));
+        return Hours.hoursBetween(date,DateTime.now().minusHours(Math.toIntExact(TimeUnit.MILLISECONDS.toHours(DateTimeZone.UTC.getOffset(DateTime.now()))))).getHours();
     }
 
     public long getUptimeMinutes(){
@@ -119,6 +119,10 @@ public class Context {
 
     public String getGame() {
         return game;
+    }
+
+    public String getTimezone() {
+        return timezone;
     }
 
     public void setUsername(String username){
@@ -180,6 +184,10 @@ public class Context {
     public void setStartedAt(String startedAt) throws ParseException {
         DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
         date = formatter.parseDateTime(startedAt);
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
     }
 
     //frequently used
