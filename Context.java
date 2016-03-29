@@ -33,7 +33,7 @@ public class Context {
     private HashMap<String, String> commands = new HashMap<>();
     private String[] vars = {"%NICK%", "%HOURS%", "%MINUTES%", "%ARG%"};
     private boolean autoSaveEnabled,autoLoginEnabled,running,partner,live;
-    private DateTime date;
+    private DateTime startedAt;
     private Timer timer;
     private final double VERSION = 1.2;
 
@@ -86,14 +86,14 @@ public class Context {
     }
 
     public long getUptimeHours(){
-        if(date != null)
-            return Hours.hoursBetween(date,DateTime.now()).getHours() - TimeUnit.MILLISECONDS.toHours(DateTimeZone.getDefault().getOffset(DateTime.now()));
+        if(startedAt != null)
+            return Hours.hoursBetween(startedAt,DateTime.now()).getHours() - TimeUnit.MILLISECONDS.toHours(DateTimeZone.getDefault().getOffset(DateTime.now()));
         return 0;
     }
 
     public long getUptimeMinutes(){
-        if(date != null)
-            return Minutes.minutesBetween(date,DateTime.now()).getMinutes() - (60*Hours.hoursBetween(date,DateTime.now()).getHours());
+        if(startedAt != null)
+            return Minutes.minutesBetween(startedAt,DateTime.now()).getMinutes() - (60*Hours.hoursBetween(startedAt,DateTime.now()).getHours());
         return 0;
     }
 
@@ -185,9 +185,9 @@ public class Context {
         this.viewers = viewers;
     }
 
-    public void setStartedAt(String startedAt) throws ParseException {
+    public void setStartedAt(String startedAtNotParsed) throws ParseException {
         DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        date = formatter.parseDateTime(startedAt);
+        startedAt = formatter.parseDateTime(startedAtNotParsed);
     }
 
     //frequently used
