@@ -86,11 +86,15 @@ public class Context {
     }
 
     public long getUptimeHours(){
-        return Hours.hoursBetween(date,DateTime.now()).getHours() - TimeUnit.MILLISECONDS.toHours(DateTimeZone.getDefault().getOffset(DateTime.now()));
+        if(date != null)
+            return Hours.hoursBetween(date,DateTime.now()).getHours() - TimeUnit.MILLISECONDS.toHours(DateTimeZone.getDefault().getOffset(DateTime.now()));
+        return 0;
     }
 
     public long getUptimeMinutes(){
-        return Minutes.minutesBetween(date,DateTime.now()).getMinutes() - (60*Hours.hoursBetween(date,DateTime.now()).getHours());
+        if(date != null)
+            return Minutes.minutesBetween(date,DateTime.now()).getMinutes() - (60*Hours.hoursBetween(date,DateTime.now()).getHours());
+        return 0;
     }
 
     public boolean isRunning() {
