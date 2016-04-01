@@ -37,7 +37,7 @@ public class Context {
     private boolean autoSaveEnabled,running,partner,live;
     private DateTime startedAt;
     private Timer timer;
-    private final double VERSION = 1.2;
+    private final double VERSION = 2;
     private ListView giveawayEntriesList;
     protected Stage stage;
 
