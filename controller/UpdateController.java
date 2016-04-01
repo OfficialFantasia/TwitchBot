@@ -36,7 +36,7 @@ public class UpdateController implements Initializable {
         update.setOnAction(ae -> {
             Desktop desktop = Desktop.getDesktop();
             try {
-                desktop.browse(new URL("http://www.mediafire.com/download/zs7c0lk57525skl/TwitchBot.jar").toURI());
+                desktop.browse(new URL("http://twitchbot.hol.es/download.html").toURI());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (URISyntaxException e) {
