@@ -1,5 +1,9 @@
 package com.fantasia;
 
+import javafx.beans.Observable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 public class ChatListener implements Runnable {
     @Override
     public void run() {
@@ -24,16 +28,18 @@ public class ChatListener implements Runnable {
     }
 
     private void onMessage(String msg, String nick) throws Exception{
+        if(msg.split(" ")[0].equals(Context.getInstance().getGiveawayCommand())){
+            if(!Context.getInstance().getGiveawayEntries().contains(nick)){
+                Context.getInstance().getGiveawayEntries().add(nick);
+                ObservableList items = FXCollections.observableList(Context.getInstance().getGiveawayEntries());
+                Context.getInstance().getGiveawayEntriesList().setItems(items);
+            }
+        }
         if(checkForCommand(msg)){
             if(msg.equals("!commands")){
                 String response = String.join(", ", Context.getInstance().getCommands().keySet());
                 sendMessage("Available Commands: " + response);
                 return;
-            }
-            String arg = "";
-            if(getCommand(msg).contains("%ARG%")){
-                String[] temp = msg.split(" ");
-                arg = temp[1];
             }
             String response = Context.getInstance().getCommands().get(getCommand(msg));
             for(String c: Context.getInstance().getVars()){
@@ -48,9 +54,6 @@ public class ChatListener implements Runnable {
                         case "%MINUTES%":
                             response = response.replaceAll(c,""+Context.getInstance().getUptimeMinutes());
                             break;
-                        case "%ARG%":
-                            response = response.replace(c,arg);
-                            break;
                         default:
                             break;
                     }
@@ -63,18 +66,10 @@ public class ChatListener implements Runnable {
     private boolean checkForCommand(String msg){
         if(!Context.getInstance().getCommands().isEmpty()){
             String[] temp = msg.split(" ");
-            if(temp.length>1){
-                if(Context.getInstance().getCommands().containsKey(temp[0]+" %ARG%")){
-                    return true;
-                } else {
-                    return false;
-                }
+            if(Context.getInstance().getCommands().containsKey(temp[0])){
+                return true;
             } else {
-                if(Context.getInstance().getCommands().containsKey(temp[0])){
-                    return true;
-                } else {
-                    return false;
-                }
+                return false;
             }
         }
         return false;

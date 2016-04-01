@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import org.joda.time.DateTime;
@@ -26,23 +27,22 @@ public class Context {
         return instance;
     }
 
-    private String username,password,channel,selectedCommand,title,game;
+    private String access_token,channel,selectedCommand,title,game,giveawayCommand;
     private int viewers;
     private BufferedReader inputStream;
     private BufferedWriter outputStream;
     private HashMap<String, String> commands = new HashMap<>();
-    private String[] vars = {"%NICK%", "%HOURS%", "%MINUTES%", "%ARG%"};
-    private boolean autoSaveEnabled,autoLoginEnabled,running,partner,live;
+    private List<String> giveawayEntries = new ArrayList<>();
+    private String[] vars = {"%NICK%", "%HOURS%", "%MINUTES%"};
+    private boolean autoSaveEnabled,running,partner,live;
     private DateTime startedAt;
     private Timer timer;
     private final double VERSION = 1.2;
+    private ListView giveawayEntriesList;
+    protected Stage stage;
 
-    public String getUsername(){
-        return username;
-    }
-
-    public String getPassword(){
-        return password;
+    public String getAccess_token() {
+        return access_token;
     }
 
     public String getChannel(){
@@ -67,10 +67,6 @@ public class Context {
 
     public boolean isAutoSaveEnabled() {
         return autoSaveEnabled;
-    }
-
-    public boolean isAutoLoginEnabled() {
-        return autoLoginEnabled;
     }
 
     public String getCommandsFile() throws Exception {
@@ -129,12 +125,24 @@ public class Context {
         return VERSION;
     }
 
-    public void setUsername(String username){
-        this.username = username;
+    public String getGiveawayCommand() {
+        return giveawayCommand;
     }
 
-    public void setPassword(String password){
-        this.password = password;
+    public List<String> getGiveawayEntries() {
+        return giveawayEntries;
+    }
+
+    public ListView getGiveawayEntriesList() {
+        return giveawayEntriesList;
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public void setAccess_token(String access_token) {
+        this.access_token = access_token;
     }
 
     public void setChannel(String channel){
@@ -151,10 +159,6 @@ public class Context {
 
     public void setAutoSaveEnabled(boolean autoSaveEnabled) {
         this.autoSaveEnabled = autoSaveEnabled;
-    }
-
-    public void setAutoLoginEnabled(boolean autoLoginEnabled) {
-        this.autoLoginEnabled = autoLoginEnabled;
     }
 
     public void setRunning(boolean running) {
@@ -190,36 +194,39 @@ public class Context {
         startedAt = formatter.parseDateTime(startedAtNotParsed);
     }
 
-    //frequently used
-    public void sendMessage(String msg) throws Exception{
-        Context.getInstance().getOutputStream().write("PRIVMSG #" + Context.getInstance().getChannel() + " :" + msg + " \r\n");
-        Context.getInstance().getOutputStream().flush();
+    public void setGiveawayCommand(String giveawayCommand) {
+        this.giveawayCommand = giveawayCommand;
     }
 
-    public void switchToCommandsTab(ActionEvent ae){
+    public void setGiveawayEntriesList(ListView giveawayEntriesList) {
+        this.giveawayEntriesList = giveawayEntriesList;
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+    //frequently used
+    public void sendMessage(String msg) throws Exception{
+        outputStream.write("PRIVMSG #" + Context.getInstance().getChannel() + " :" + msg + " \r\n");
+        outputStream.flush();
+    }
+
+    public void switchToCommandsTab(){
         try{
-            TabPane root = FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/controls.fxml"));
+            TabPane root = FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/main.fxml"));
             root.getSelectionModel().select(2);
-            Stage newStage = (Stage) ((Node) ae.getSource()).getScene().getWindow();
-            newStage.setScene(new Scene(root,354,227));
-            newStage.show();
+            stage.setScene(new Scene(root,354,227));
+            stage.show();
         } catch (Exception ex){
             ex.printStackTrace();
         }
     }
 
-    public void switchTo(String destination,Parent root) throws IOException {
+    public void switchTo(String destination) throws IOException {
         Parent channel = FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/" + destination + ".fxml"));
-        Stage newStage = (Stage) root.getScene().getWindow();
-        newStage.setScene(new Scene(channel,354,227));
-        newStage.show();
-    }
-
-    public void switchTo(String destination,ActionEvent ae) throws IOException {
-        Parent channel = FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/" + destination + ".fxml"));
-        Stage newStage = (Stage) ((Node) ae.getSource()).getScene().getWindow();
-        newStage.setScene(new Scene(channel,354,227));
-        newStage.show();
+        stage.setScene(new Scene(channel,354,227));
+        stage.show();
     }
 
     public void startTimer(TimerTask task){

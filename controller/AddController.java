@@ -20,7 +20,7 @@ public class AddController implements Initializable{
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //UI-Elements
         cancel.setOnAction(ae -> {
-            Context.getInstance().switchToCommandsTab(ae);
+            Context.getInstance().switchToCommandsTab();
         });
         add.setOnAction(ae -> {
             if(!command.getText().equals("") && !output.getText().equals("")){
@@ -35,7 +35,7 @@ public class AddController implements Initializable{
                     Context.getInstance().getCommands().put(command.getText(),output.getText());
                     System.out.println("Command added!");
                 }
-                Context.getInstance().switchToCommandsTab(ae);
+                Context.getInstance().switchToCommandsTab();
             }
         });
     }

@@ -3,11 +3,15 @@ package com.fantasia.controller;
 import com.fantasia.Context;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -42,18 +46,16 @@ public class UpdateController implements Initializable {
         });
         cancel.setOnAction(ae -> {
             try {
-                Context.getInstance().switchTo("login",ae);
+                Context.getInstance().switchTo("login");
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
-        Platform.runLater(() -> {
-            try {
-                checkForUpdate();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        try {
+            checkForUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void checkForUpdate() throws Exception{
@@ -66,19 +68,27 @@ public class UpdateController implements Initializable {
         JSONObject obj = new JSONObject(str);
         double version = obj.getDouble("version");
         if(version != Context.getInstance().getVERSION()){
-            update.setVisible(true);
-            cancel.setVisible(true);
-            found.setVisible(true);
-            check.setVisible(false);
-            spinner.setVisible(false);
-            newversion.setVisible(true);
-            currentversion.setVisible(true);
-            newval.setText(version+"");
-            newval.setVisible(true);
-            currval.setText(Context.getInstance().getVERSION()+"");
-            currval.setVisible(true);
+            Platform.runLater(() -> {
+                update.setVisible(true);
+                cancel.setVisible(true);
+                found.setVisible(true);
+                check.setVisible(false);
+                spinner.setVisible(false);
+                newversion.setVisible(true);
+                currentversion.setVisible(true);
+                newval.setText(version+"");
+                newval.setVisible(true);
+                currval.setText(Context.getInstance().getVERSION()+"");
+                currval.setVisible(true);
+            });
         } else {
-            Context.getInstance().switchTo("login",check);
+            Platform.runLater(() -> {
+                try {
+                    Context.getInstance().switchTo("login");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         }
     }
 }

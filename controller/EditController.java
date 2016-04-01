@@ -21,13 +21,13 @@ public class EditController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         //UI-Elements
         cancel.setOnAction(ae -> {
-            Context.getInstance().switchToCommandsTab(ae);
+            Context.getInstance().switchToCommandsTab();
         });
         save.setOnAction(ae -> {
             if(!command.getText().equals("") && !output.getText().equals("")){
                 Context.getInstance().getCommands().remove(command.getText());
                 Context.getInstance().getCommands().put(command.getText(),output.getText());
-                Context.getInstance().switchToCommandsTab(ae);
+                Context.getInstance().switchToCommandsTab();
             }
         });
         //set data

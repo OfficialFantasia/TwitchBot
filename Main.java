@@ -20,5 +20,6 @@ public class Main extends Application {
         primaryStage.setTitle("TwitchBot");
         primaryStage.setScene(new Scene(root, 354, 227));
         primaryStage.show();
+        Context.getInstance().setStage(primaryStage);
     }
 }

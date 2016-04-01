@@ -3,12 +3,17 @@ package com.fantasia.controller;
 import com.fantasia.Context;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import javafx.stage.Stage;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -26,24 +31,13 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.Base64;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 
 public class LoginController implements Initializable{
 
     //FXML
     @FXML
-    private Pane root;
-    @FXML
-    private Button submit;
-    @FXML
-    private TextField userInput;
-    @FXML
-    private PasswordField passInput;
-    @FXML
-    private Label error;
-    @FXML
-    private CheckBox saveLogin;
-    @FXML
-    private Hyperlink getPassword;
+    private WebView loginPage;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -59,74 +53,70 @@ public class LoginController implements Initializable{
             if(!(file = new File(Context.getInstance().getOptionsFile())).exists()){
                 createDefaultOptions();
             }
-            loadLogin();
+            loadToken();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //UI-Elements
-        submit.setOnAction(ae -> {
-            if(!userInput.getText().equals("") && !passInput.getText().equals("")){
-                Context.getInstance().setUsername(userInput.getText());
-                Context.getInstance().setPassword(passInput.getText());
-            }
-            try {
-                if(!connect()){
-                    error.setVisible(true);
-                } else {
-                    if(saveLogin.isSelected()){
-                        saveLogin();
-                    }
-                    Context.getInstance().switchTo("channel",ae);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        getPassword.setOnAction(ae -> {
-            Desktop desktop = Desktop.getDesktop();
-            try {
-                desktop.browse(new URL("http://twitchapps.com/tmi/").toURI());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
         //check for login information
-        checkLogin();
+        Platform.runLater(() -> {
+            checkToken();
+        });
     }
 
-    private void checkLogin(){
-        Platform.runLater(() -> {
-            if(Context.getInstance().isAutoLoginEnabled()){
-                try {
-                    if(!connect()){
-                        error.setVisible(true);
-                    } else {
-                        Context.getInstance().switchTo("channel",root);
-                    }
-                } catch (Exception ex){
-                    error.setVisible(true);
-                    ex.printStackTrace();
+    private void checkToken(){
+        if(!Context.getInstance().getAccess_token().equals("null")){
+            try {
+                if(!connect() || !joinChannel()){
+                    //todo error handling
+                } else {
+
+                        try {
+                            Context.getInstance().switchTo("main");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
                 }
+            } catch (Exception ex){
+                ex.printStackTrace();
             }
-        });
+        } else {
+            Context.getInstance().getStage().setHeight(450);
+            WebEngine engine = loginPage.getEngine();
+            engine.load("https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id=34owd8ft79nb9rsahepr3agcqvvk11k&redirect_uri=http://twitchbot.hol.es/&scope=channel_check_subscription%20channel_editor%20channel_commercial%20user_read");
+            engine.getLoadWorker().stateProperty().addListener(cl -> {
+                String location = engine.getLocation();
+                if(location.contains("#access_token")){
+                    try{
+                        Context.getInstance().setAccess_token(location.substring(location.indexOf("=")+1,location.indexOf("&")));
+                        saveToken();
+                        if(connect()){
+                            Context.getInstance().getStage().setHeight(264);
+                            Context.getInstance().switchTo("main");
+                        }
+                    } catch(Exception ex){
+                        ex.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 
     private boolean connect() throws Exception{
         Socket server = new Socket("irc.twitch.tv", 6667);
         Context.getInstance().setInputStream(new BufferedReader(new InputStreamReader(server.getInputStream())));
         Context.getInstance().setOutputStream(new BufferedWriter(new OutputStreamWriter(server.getOutputStream())));
-        Context.getInstance().getOutputStream().write("PASS " + Context.getInstance().getPassword() + " \r\n");
+        Context.getInstance().getOutputStream().write("PASS oauth:m0htof1j4l2c6e5dx8w4az87bwbnfc \r\n");
         Context.getInstance().getOutputStream().flush();
-        Context.getInstance().getOutputStream().write("NICK " + Context.getInstance().getUsername() + " \r\n");
+        Context.getInstance().getOutputStream().write("NICK botfantasia \r\n");
         Context.getInstance().getOutputStream().flush();
-        Context.getInstance().getOutputStream().write("USER " + Context.getInstance().getUsername() + " 8 * : Twitch Bot \r\n");
+        Context.getInstance().getOutputStream().write("USER botfantasia 8 * : Twitch Bot \r\n");
         Context.getInstance().getOutputStream().flush();
 
         String line;
         while((line = Context.getInstance().getInputStream().readLine()) != null){
             if(line.contains("004")){
-                System.out.println("Connected to: " + Context.getInstance().getUsername());
+                System.out.println("Connected to: botfantasia");
                 return true;
             } else if(line.contains("433") || line.contains("NOTICE * :")) {
                 System.out.println("Couldn't connect!");
@@ -136,7 +126,32 @@ public class LoginController implements Initializable{
         return false;
     }
 
-    private void loadLogin() throws Exception{
+    private boolean joinChannel() throws Exception{
+        URL url = new URL("https://api.twitch.tv/kraken/user?oauth_token=" + Context.getInstance().getAccess_token());
+        Scanner scan = new Scanner(url.openStream());
+        String json = "";
+        while (scan.hasNext()){
+            json += scan.nextLine();
+        }
+        JSONObject obj = new JSONObject(json);
+        String channel = obj.getString("display_name");
+        Context.getInstance().getOutputStream().write("JOIN #" + channel + " \r\n");
+        Context.getInstance().getOutputStream().flush();
+        String line;
+        while((line = Context.getInstance().getInputStream().readLine()) != null){
+            if(line.indexOf("366") >= 0){
+                System.out.println("Joined channel: " + channel);
+                Context.getInstance().setChannel(channel);
+                return true;
+            } else if(line.equals("")){
+                System.out.println("Couldn't join channel: " + channel);
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private void loadToken() throws Exception{
         File file;
         file = new File(Context.getInstance().getOptionsFile());
         if(!file.exists()){
@@ -150,29 +165,15 @@ public class LoginController implements Initializable{
         NodeList list = root.getChildNodes();
         for(int i = 0;i<list.getLength();i++){
             if(list.item(i).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE){
-                if(list.item(i).getNodeName().equals("autologin")){
-                    NodeList l = list.item(i).getChildNodes();
-                    switch(l.item(0).getTextContent()){
-                        case "0":
-                            Context.getInstance().setAutoLoginEnabled(false);
-                            break;
-                        case "1":
-                            Context.getInstance().setAutoLoginEnabled(true);
-                            break;
-                    }
-                    if(Context.getInstance().isAutoLoginEnabled()){
-                        Context.getInstance().setUsername(l.item(1).getTextContent());
-                        Context.getInstance().setPassword(new String(Base64.getUrlDecoder().decode(l.item(2).getTextContent()), "utf-8"));
-                        saveLogin.setSelected(true);
-                        userInput.setText(Context.getInstance().getUsername());
-                        passInput.setText(Context.getInstance().getPassword());
-                    }
+                if(list.item(i).getNodeName().equals("access_token")){
+                    String token = list.item(i).getTextContent();
+                    Context.getInstance().setAccess_token(token);
                 }
             }
         }
     }
 
-    private void saveLogin() throws Exception{
+    private void saveToken() throws Exception{
         File file = new File(Context.getInstance().getOptionsFile());
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
@@ -182,11 +183,8 @@ public class LoginController implements Initializable{
         NodeList list = root.getChildNodes();
         for(int i = 0;i<list.getLength();i++){
             if(list.item(i).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE){
-                if(list.item(i).getNodeName().equals("autologin")){
-                    NodeList l = list.item(i).getChildNodes();
-                    l.item(0).setTextContent("1");
-                    l.item(1).setTextContent(Context.getInstance().getUsername());
-                    l.item(2).setTextContent(Base64.getUrlEncoder().encodeToString(Context.getInstance().getPassword().getBytes("utf-8")));
+                if(list.item(i).getNodeName().equals("access_token")){
+                    list.item(i).setTextContent(Context.getInstance().getAccess_token());
                 }
             }
         }
@@ -229,17 +227,9 @@ public class LoginController implements Initializable{
         autosave.appendChild(doc.createTextNode("0"));
         general.appendChild(autosave);
         root.appendChild(general);
-        Element autologin = doc.createElement("autologin");
-        Element enabled = doc.createElement("enabled");
-        enabled.appendChild(doc.createTextNode("0"));
-        autologin.appendChild(enabled);
-        Element name = doc.createElement("name");
-        name.appendChild(doc.createTextNode("null"));
-        autologin.appendChild(name);
-        Element pass = doc.createElement("pass");
-        pass.appendChild(doc.createTextNode("null"));
-        autologin.appendChild(pass);
-        root.appendChild(autologin);
+        Element access_token = doc.createElement("access_token");
+        access_token.appendChild(doc.createTextNode("null"));
+        root.appendChild(access_token);
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
         DOMSource src = new DOMSource(doc);
