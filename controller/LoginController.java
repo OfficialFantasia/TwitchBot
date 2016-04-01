@@ -83,7 +83,7 @@ public class LoginController implements Initializable{
         } else {
             Context.getInstance().getStage().setHeight(450);
             WebEngine engine = loginPage.getEngine();
-            engine.load("https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id=34owd8ft79nb9rsahepr3agcqvvk11k&redirect_uri=http://twitchbot.hol.es/&scope=channel_check_subscription%20channel_editor%20channel_commercial%20user_read");
+            engine.load("https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id=34owd8ft79nb9rsahepr3agcqvvk11k&redirect_uri=http://twitchbot.hol.es/token.php&scope=channel_check_subscription%20channel_editor%20channel_commercial%20user_read");
             engine.getLoadWorker().stateProperty().addListener(cl -> {
                 String location = engine.getLocation();
                 if(location.contains("#access_token")){
