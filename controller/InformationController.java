@@ -80,6 +80,7 @@ public class InformationController implements Initializable {
                 if((title.getText().equals(Context.getInstance().getTitle()) && game.getText().equals(Context.getInstance().getGame())) || Context.getInstance().getTitle() == null){
                     try {
                         updateStreamerInfo();
+                        updateStreamInfo();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -98,53 +99,54 @@ public class InformationController implements Initializable {
         return str;
     }
 
+    private String fetchStreamInfo() throws Exception{
+        URL url = new URL("https://api.twitch.tv/kraken/streams/" + Context.getInstance().getChannel());
+        Scanner scan = new Scanner(url.openStream());
+        String str = "";
+        while (scan.hasNext())
+            str += scan.nextLine();
+        scan.close();
+        return str;
+    }
+
     private void updateStreamerInfo() throws Exception{
         Platform.runLater(() -> {
             spinner.setVisible(true);
             infoLabel.setVisible(true);
         });
         JSONObject obj = new JSONObject(fetchStreamerInfo());
-        /*if(obj.isNull("stream")){
-            Context.getInstance().setLive(false);
-            Platform.runLater(() -> {
-                streamStatus.setText("Not live");
-                toggleSlow.setDisable(true);
-                toggleSub.setDisable(true);
-                ban.setDisable(true);
-                banInput.setDisable(true);
-                spinner.setVisible(false);
-                infoLabel.setVisible(false);
-                timeout.setDisable(true);
-                timeoutInput.setDisable(true);
-                unban.setDisable(true);
-                unbanInput.setDisable(true);
-            });
-            return;
-        }*/
-        //Context.getInstance().setLive(true);
-        //JSONObject stream = obj.getJSONObject("stream");
-        //Context.getInstance().setViewers(stream.getInt("viewers"));
-        //Context.getInstance().setStartedAt(stream.getString("created_at"));
-        //JSONObject channel = stream.getJSONObject("channel");
         Context.getInstance().setPartner(obj.getBoolean("partner"));
         Context.getInstance().setGame(obj.getString("game"));
         Context.getInstance().setTitle(obj.getString("status"));
         Platform.runLater(() -> {
-            //    toggleSlow.setDisable(false);
-            //    toggleSub.setDisable(!Context.getInstance().isPartner());
-            //    ban.setDisable(false);
-            //    banInput.setDisable(false);
-            //    streamStatus.setText("Live");
-            viewers.setText(Context.getInstance().getViewers());
             game.setText(Context.getInstance().getGame());
             title.setText(Context.getInstance().getTitle());
+        });
+    }
+
+    private void updateStreamInfo() throws Exception{
+        JSONObject obj = new JSONObject(fetchStreamInfo());
+        if(obj.isNull("stream")){
+            Context.getInstance().setLive(false);
+            Platform.runLater(() -> {
+                streamStatus.setText("Not live");
+                spinner.setVisible(false);
+                infoLabel.setVisible(false);
+            });
+            ControlsController.getInstance().setDisabled(true);
+            return;
+        }
+        Context.getInstance().setLive(true);
+        JSONObject stream = obj.getJSONObject("stream");
+        Context.getInstance().setViewers(stream.getInt("viewers"));
+        Context.getInstance().setStartedAt(stream.getString("created_at"));
+        Platform.runLater(() -> {
+            streamStatus.setText("Live");
+            viewers.setText(Context.getInstance().getViewers());
             spinner.setVisible(false);
             infoLabel.setVisible(false);
-            //    timeout.setDisable(false);
-            //    timeoutInput.setDisable(false);
-            //    unban.setDisable(false);
-            //    unbanInput.setDisable(false);
         });
+        ControlsController.getInstance().setDisabled(false);
     }
 
     private void changeInfos(boolean title,boolean game) throws Exception{

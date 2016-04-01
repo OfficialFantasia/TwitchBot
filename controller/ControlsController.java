@@ -16,11 +16,18 @@ public class ControlsController implements Initializable{
     @FXML
     private Label slowStatus,subStatus;
     @FXML
-    private ToggleButton toggleSlow,toggleSub;
+    public ToggleButton toggleSlow,toggleSub;
     @FXML
-    private TextField banInput,timeoutInput,unbanInput;
+    public TextField banInput,timeoutInput,unbanInput;
     @FXML
-    private Button ban,timeout,unban;
+    public Button ban,timeout,unban;
+
+    private boolean disabled;
+
+    final static protected ControlsController instance = new ControlsController();
+    public static ControlsController getInstance() {
+        return instance;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -92,5 +99,19 @@ public class ControlsController implements Initializable{
                 }
             }
         });
+        toggleSlow.setDisable(disabled);
+        toggleSub.setDisable(!Context.getInstance().isPartner());
+        if(!Context.getInstance().isPartner())
+            subStatus.setText("not partnered");
+        ban.setDisable(disabled);
+        banInput.setDisable(disabled);
+        timeout.setDisable(disabled);
+        timeoutInput.setDisable(disabled);
+        unban.setDisable(disabled);
+        unbanInput.setDisable(disabled);
+    }
+
+    public void setDisabled(boolean disabled){
+        this.disabled = disabled;
     }
 }
