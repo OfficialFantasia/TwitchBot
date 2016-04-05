@@ -2,10 +2,12 @@ package com.fantasia.controller;
 
 import com.fantasia.ChatListener;
 import com.fantasia.Context;
+import com.fantasia.TabManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -19,7 +21,8 @@ import java.util.*;
 
 public class MainController implements Initializable{
 
-
+    @FXML
+    private TabPane root;
     @FXML
     private Tab information,controls,commands,giveaway,options;
 
@@ -27,18 +30,31 @@ public class MainController implements Initializable{
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //load vars and start chat listener
         try {
-            if (Context.getInstance().getCommands().isEmpty())
-                loadCommands();
+            loadCommands();
             loadOptions();
-            if (!Context.getInstance().isRunning()) {
-                Thread t = new Thread(new ChatListener());
-                t.start();
-            }
+            Thread t = new Thread(new ChatListener());
+            t.start();
             information.setContent(FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/information.fxml")));
+            TabManager.getInstance().setInformation(information);
             controls.setContent(FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/controls.fxml")));
+            TabManager.getInstance().setControls(controls);
             commands.setContent(FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/commands.fxml")));
+            TabManager.getInstance().setCommands(commands);
             giveaway.setContent(FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/giveaway.fxml")));
+            TabManager.getInstance().setGiveaway(giveaway);
             options.setContent(FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/options.fxml")));
+            TabManager.getInstance().setOptions(options);
+            root.getSelectionModel().selectedItemProperty().addListener(cl -> {
+                if(root.getSelectionModel().getSelectedIndex() == 4){
+                    try {
+                        //reload options tab so checkboxes are selected according to options
+                        options.setContent(null);
+                        options.setContent(FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/options.fxml")));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -81,6 +97,25 @@ public class MainController implements Initializable{
                             break;
                         case "0":
                             Context.getInstance().setAutoSaveEnabled(false);
+                            break;
+                    }
+                }
+                if(list.item(i).getNodeName().equals("giveaway")){
+                    NodeList l = list.item(i).getChildNodes();
+                    switch(l.item(0).getTextContent()){
+                        case "1":
+                            Context.getInstance().setModsCanWin(true);
+                            break;
+                        case "0":
+                            Context.getInstance().setModsCanWin(false);
+                            break;
+                    }
+                    switch(l.item(1).getTextContent()){
+                        case "1":
+                            Context.getInstance().setOnlySubsAndMods(true);
+                            break;
+                        case "0":
+                            Context.getInstance().setOnlySubsAndMods(false);
                             break;
                     }
                 }

@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.web.WebView?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="518.0" prefWidth="354.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fantasia.controller.LoginController">
+<Pane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="354.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fantasia.controller.LoginController">
    <children>
-      <WebView fx:id="loginPage" prefHeight="520.0" prefWidth="354.0" />
+      <WebView fx:id="loginPage" prefHeight="420.0" prefWidth="354.0" />
+      <Label fx:id="loading" layoutX="157.0" layoutY="105.0" text="logging in..." />
+      <ImageView fx:id="spinner" fitHeight="16.0" fitWidth="16.0" layoutX="136.0" layoutY="105.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../res/spinner.gif" />
+         </image>
+      </ImageView>
    </children>
 </Pane>

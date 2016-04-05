@@ -6,16 +6,15 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="227.0" prefWidth="354.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fantasia.controller.EditController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="198.0" prefWidth="354.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fantasia.controller.EditController">
    <children>
-      <Label layoutX="25.0" layoutY="51.0" text="Command:" />
-      <Label layoutX="25.0" layoutY="93.0" text="Output:" />
-      <TextField fx:id="command" layoutX="102.0" layoutY="47.0" />
-      <TextField fx:id="output" layoutX="102.0" layoutY="89.0" />
-      <Button fx:id="save" layoutX="14.0" layoutY="180.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="128.0" text="Save" />
-      <Button fx:id="cancel" layoutX="153.0" layoutY="180.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="128.0" text="Cancel" />
-      <Label layoutX="25.0" layoutY="125.0" prefHeight="17.0" prefWidth="288.0" text="Use %NICK%, %HOURS% and %MINUTES% for more interaction">
+      <Label layoutX="25.0" layoutY="20.0" text="Command:" />
+      <Label layoutX="25.0" layoutY="62.0" text="Output:" />
+      <TextField fx:id="command" layoutX="102.0" layoutY="16.0" />
+      <TextField fx:id="output" layoutX="102.0" layoutY="58.0" />
+      <Button fx:id="save" layoutX="14.0" layoutY="149.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="128.0" text="Save" />
+      <Button fx:id="cancel" layoutX="153.0" layoutY="149.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="128.0" text="Cancel" />
+      <Label layoutX="25.0" layoutY="94.0" prefHeight="17.0" prefWidth="288.0" text="Use %NICK%, %HOURS% and %MINUTES% for more interaction">
          <font>
             <Font size="10.0" />
          </font>

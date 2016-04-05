@@ -1,26 +1,28 @@
 package com.fantasia.controller;
 
 import com.fantasia.Context;
+import com.fantasia.TabManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.Scanner;
-import java.util.TimerTask;
+import java.util.*;
 
 public class InformationController implements Initializable {
 
     @FXML
-    private Button saveTitle,saveGame;
+    private Button saveTitle,saveGame,preview,showMods;
     @FXML
     private TextField game,title;
     @FXML
@@ -30,6 +32,12 @@ public class InformationController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        if(Context.getInstance().getTitle() != null && Context.getInstance().getGame() != null){
+            title.setText(Context.getInstance().getTitle());
+            game.setText(Context.getInstance().getGame());
+        }
+
         title.textProperty().addListener(cl -> {
             if(!title.getText().equals(Context.getInstance().getTitle())){
                 saveTitle.setVisible(true);
@@ -42,7 +50,7 @@ public class InformationController implements Initializable {
         saveTitle.setOnAction(ae -> {
             if(!title.getText().equals("") && !title.getText().equals(Context.getInstance().getTitle())){
                 try {
-                    changeInfos(true,false);
+                    changeInfo(true,false);
                     Context.getInstance().setTitle(title.getText());
                     saveTitle.setVisible(false);
                     title.setPrefWidth(235);
@@ -63,7 +71,7 @@ public class InformationController implements Initializable {
         saveGame.setOnAction(ae -> {
             if(!game.getText().equals("") && !game.getText().equals(Context.getInstance().getTitle())){
                 try {
-                    changeInfos(false,true);
+                    changeInfo(false,true);
                     Context.getInstance().setGame(game.getText());
                     saveGame.setVisible(false);
                     game.setPrefWidth(235);
@@ -72,84 +80,139 @@ public class InformationController implements Initializable {
                 }
             }
         });
-
+        preview.setOnAction(ae -> {
+            try {
+                TabManager.getInstance().getInformation().setContent(FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/preview.fxml")));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        showMods.setOnAction(ae -> {
+            try {
+                TabManager.getInstance().getInformation().setContent(FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/mods.fxml")));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         //start timer for stream information
         Context.getInstance().startTimer(new TimerTask() {
             @Override
             public void run() {
                 if((title.getText().equals(Context.getInstance().getTitle()) && game.getText().equals(Context.getInstance().getGame())) || Context.getInstance().getTitle() == null){
-                    try {
-                        updateStreamerInfo();
-                        updateStreamInfo();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    update();
                 }
             }
         });
     }
 
-    private String fetchStreamerInfo() throws Exception{
-        URL url = new URL("https://api.twitch.tv/kraken/channels/" + Context.getInstance().getChannel() + "?oauth_token=" + Context.getInstance().getAccess_token());
-        Scanner scan = new Scanner(url.openStream());
-        String str = "";
-        while (scan.hasNext())
-            str += scan.nextLine();
-        scan.close();
-        return str;
-    }
-
-    private String fetchStreamInfo() throws Exception{
-        URL url = new URL("https://api.twitch.tv/kraken/streams/" + Context.getInstance().getChannel());
-        Scanner scan = new Scanner(url.openStream());
-        String str = "";
-        while (scan.hasNext())
-            str += scan.nextLine();
-        scan.close();
-        return str;
-    }
-
-    private void updateStreamerInfo() throws Exception{
+    private void update(){
         Platform.runLater(() -> {
             spinner.setVisible(true);
             infoLabel.setVisible(true);
         });
-        JSONObject obj = new JSONObject(fetchStreamerInfo());
-        Context.getInstance().setPartner(obj.getBoolean("partner"));
-        Context.getInstance().setGame(obj.getString("game"));
-        Context.getInstance().setTitle(obj.getString("status"));
-        Platform.runLater(() -> {
-            game.setText(Context.getInstance().getGame());
-            title.setText(Context.getInstance().getTitle());
-        });
-    }
+        //streamer
+        try{
+            URL url = new URL("https://api.twitch.tv/kraken/channels/" + Context.getInstance().getChannel() + "?oauth_token=" + Context.getInstance().getAccess_token());
+            Scanner scan = new Scanner(url.openStream());
+            String streamerjson = "";
+            while (scan.hasNext())
+                streamerjson += scan.nextLine();
+            scan.close();
+            JSONObject streamer = new JSONObject(streamerjson);
+            Context.getInstance().setPartner(streamer.getBoolean("partner"));
+            Context.getInstance().setGame(streamer.getString("game"));
+            Context.getInstance().setTitle(streamer.getString("status"));
+        } catch(Exception ex){
+            ex.printStackTrace();
+        }
+        //stream
+        try{
+            URL url = new URL("https://api.twitch.tv/kraken/streams/" + Context.getInstance().getChannel());
+            Scanner scan = new Scanner(url.openStream());
+            String streamjson = "";
+            while (scan.hasNext())
+                streamjson += scan.nextLine();
+            scan.close();
+            JSONObject stream = new JSONObject(streamjson);
+            if(stream.isNull("stream")){
+                Context.getInstance().setLive(false);
+            } else {
+                Context.getInstance().setLive(true);
+                JSONObject streaminfo = stream.getJSONObject("stream");
+                Context.getInstance().setViewers(streaminfo.getInt("viewers"));
+                Context.getInstance().setStartedAt(streaminfo.getString("created_at"));
+            }
+        } catch(Exception ex){
+            ex.printStackTrace();
+        }
+        //mods
+        try {
+            URL url = new URL("http://tmi.twitch.tv/group/user/" + Context.getInstance().getChannel() + "/chatters");
+            Scanner scan = new Scanner(url.openStream());
+            String chatterjson = "";
+            while (scan.hasNext())
+                chatterjson += scan.nextLine();
+            scan.close();
+            JSONObject chatters = new JSONObject(chatterjson);
+            if(chatters.getInt("chatter_count") > 0){
+                JSONArray mods = chatters.getJSONObject("chatters").getJSONArray("moderators");
+                Context.getInstance().getModerators().clear();
+                for(int i=0;i<mods.length();i++){
+                    System.out.println(mods.get(i));
+                    Context.getInstance().getModerators().add((String) mods.get(i));
+                }
+                Context.getInstance().getModerators().remove("botfantasia");
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+        //subs
+        try{
+            URL url = new URL("https://api.twitch.tv/kraken/channels/" + Context.getInstance().getChannel() + "/subscriptions?oauth_token=" + Context.getInstance().getAccess_token());
+            Scanner scan = new Scanner(url.openStream());
+            String subsjson = "";
+            while (scan.hasNext())
+                subsjson += scan.nextLine();
+            scan.close();
+            JSONArray subs = new JSONObject(subsjson).getJSONArray("subscriptions");
+            Context.getInstance().getSubs().clear();
+            for(int i=0;i<subs.length();i++){
+                JSONObject obj = (JSONObject) subs.get(i);
+                String display_name = obj.getJSONObject("user").getString("display_name");
+                Context.getInstance().getSubs().add(display_name);
+            }
+        } catch (Exception ex){
+            Context.getInstance().getSubs().clear();
+        }
 
-    private void updateStreamInfo() throws Exception{
-        JSONObject obj = new JSONObject(fetchStreamInfo());
-        if(obj.isNull("stream")){
-            Context.getInstance().setLive(false);
+
+        //ui
+        if(Context.getInstance().isLive()){
+            Platform.runLater(() -> {
+                streamStatus.setText("Live");
+                viewers.setText(Context.getInstance().getViewers());
+                preview.setDisable(false);
+            });
+        } else {
             Platform.runLater(() -> {
                 streamStatus.setText("Not live");
-                spinner.setVisible(false);
-                infoLabel.setVisible(false);
+                viewers.setText(""+0);
+                preview.setDisable(true);
             });
-            ControlsController.getInstance().setDisabled(true);
-            return;
         }
-        Context.getInstance().setLive(true);
-        JSONObject stream = obj.getJSONObject("stream");
-        Context.getInstance().setViewers(stream.getInt("viewers"));
-        Context.getInstance().setStartedAt(stream.getString("created_at"));
         Platform.runLater(() -> {
-            streamStatus.setText("Live");
-            viewers.setText(Context.getInstance().getViewers());
+            title.setText(Context.getInstance().getTitle());
+            game.setText(Context.getInstance().getGame());
+            if(!Context.getInstance().getModerators().isEmpty())
+                showMods.setDisable(false);
+            else
+                showMods.setDisable(true);
             spinner.setVisible(false);
             infoLabel.setVisible(false);
         });
-        ControlsController.getInstance().setDisabled(false);
     }
 
-    private void changeInfos(boolean title,boolean game) throws Exception{
+    private void changeInfo(boolean title,boolean game) throws Exception{
         URL url = new URL("https://api.twitch.tv/kraken/channels/" + Context.getInstance().getChannel());
         HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
         httpCon.setRequestProperty("Accept","application/vnd.twitchtv.v2+json");

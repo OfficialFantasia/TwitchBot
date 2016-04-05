@@ -2,13 +2,31 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.layout.Pane?>
-
+<?import javafx.scene.text.Font?>
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="198.0" prefWidth="354.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fantasia.controller.OptionsController">
    <children>
-      <CheckBox fx:id="autoSave" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Enable  Autosaving" />
+      <CheckBox fx:id="autoSave" layoutX="17.0" layoutY="38.0" mnemonicParsing="false" text="Enable  Autosaving" />
       <Button fx:id="saveOptions" layoutX="14.0" layoutY="151.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="128.0" text="Save" />
       <Button fx:id="logout" layoutX="149.0" layoutY="151.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="128.0" text="Logout" />
+      <Label layoutX="17.0" layoutY="14.0" text="General" />
+      <Label layoutX="154.0" layoutY="14.0" text="Givewaway" />
+      <CheckBox fx:id="modwin" layoutX="154.0" layoutY="38.0" mnemonicParsing="false" text="Moderators can win" />
+      <CheckBox fx:id="subandmod" layoutX="154.0" layoutY="63.0" mnemonicParsing="false" text="Only subs and mods can win" />
+      <Separator layoutY="139.0" prefHeight="3.0" prefWidth="354.0" />
+      <Separator layoutX="145.0" layoutY="-61.0" orientation="VERTICAL" prefHeight="200.0" />
+      <Slider fx:id="subscriberluck" blockIncrement="1.0" disable="true" layoutX="154.0" layoutY="87.0" majorTickUnit="1.0" max="10.0" minorTickCount="0" showTickMarks="true" snapToTicks="true" />
+      <Label fx:id="warning" visible="false" layoutX="153.0" layoutY="120.0" text="Warning:" textFill="RED">
+         <font>
+            <Font size="9.0" />
+         </font></Label>
+      <Label fx:id="warningmsg" layoutX="193.0" layoutY="118.0" prefHeight="17.0" prefWidth="154.0" textFill="RED">
+         <font>
+            <Font size="9.0" />
+         </font></Label>
    </children>
 </Pane>

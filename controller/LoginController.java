@@ -5,10 +5,12 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -37,7 +39,13 @@ public class LoginController implements Initializable{
 
     //FXML
     @FXML
+    private Pane root;
+    @FXML
     private WebView loginPage;
+    @FXML
+    private Label loading;
+    @FXML
+    private ImageView spinner;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -69,29 +77,25 @@ public class LoginController implements Initializable{
                 if(!connect() || !joinChannel()){
                     //todo error handling
                 } else {
-
-                        try {
-                            Context.getInstance().switchTo("main");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
+                    Context.getInstance().switchTo("main");
                 }
             } catch (Exception ex){
                 ex.printStackTrace();
             }
         } else {
-            Context.getInstance().getStage().setHeight(450);
+            spinner.setVisible(false);
+            loading.setVisible(false);
+            Context.getInstance().getStage().setHeight(root.getPrefHeight() + 29);
             WebEngine engine = loginPage.getEngine();
-            engine.load("https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id=34owd8ft79nb9rsahepr3agcqvvk11k&redirect_uri=http://twitchbot.hol.es/token.php&scope=channel_check_subscription%20channel_editor%20channel_commercial%20user_read");
+            engine.load("https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id=34owd8ft79nb9rsahepr3agcqvvk11k&redirect_uri=http://twitchbot.hol.es/token.php&scope=channel_subscriptions%20channel_editor%20channel_commercial%20user_read");
             engine.getLoadWorker().stateProperty().addListener(cl -> {
                 String location = engine.getLocation();
                 if(location.contains("#access_token")){
                     try{
                         Context.getInstance().setAccess_token(location.substring(location.indexOf("=")+1,location.indexOf("&")));
                         saveToken();
-                        if(connect()){
-                            Context.getInstance().getStage().setHeight(264);
+                        if(connect() && joinChannel()){
+                            Context.getInstance().getStage().setHeight(227 + 29);
                             Context.getInstance().switchTo("main");
                         }
                     } catch(Exception ex){
@@ -167,7 +171,10 @@ public class LoginController implements Initializable{
             if(list.item(i).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE){
                 if(list.item(i).getNodeName().equals("access_token")){
                     String token = list.item(i).getTextContent();
-                    Context.getInstance().setAccess_token(token);
+                    if(!token.equals("null"))
+                        Context.getInstance().setAccess_token(new String(Base64.getDecoder().decode(token.getBytes())));
+                    else
+                        Context.getInstance().setAccess_token(token);
                 }
             }
         }
@@ -184,7 +191,7 @@ public class LoginController implements Initializable{
         for(int i = 0;i<list.getLength();i++){
             if(list.item(i).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE){
                 if(list.item(i).getNodeName().equals("access_token")){
-                    list.item(i).setTextContent(Context.getInstance().getAccess_token());
+                    list.item(i).setTextContent(Base64.getEncoder().encodeToString(Context.getInstance().getAccess_token().getBytes()));
                 }
             }
         }
@@ -222,11 +229,25 @@ public class LoginController implements Initializable{
         Document doc = builder.newDocument();
         Element root = doc.createElement("options");
         doc.appendChild(root);
+        Element version = doc.createElement("version");
+        version.appendChild(doc.createTextNode("" + Context.getInstance().getVERSION()));
+        root.appendChild(version);
         Element general = doc.createElement("general");
         Element autosave = doc.createElement("autosave");
         autosave.appendChild(doc.createTextNode("0"));
         general.appendChild(autosave);
         root.appendChild(general);
+        Element giveaway = doc.createElement("giveaway");
+        Element mods = doc.createElement("mods");
+        mods.appendChild(doc.createTextNode("1"));
+        giveaway.appendChild(mods);
+        Element subs = doc.createElement("onlysubsandmods");
+        subs.appendChild(doc.createTextNode("0"));
+        giveaway.appendChild(subs);
+        Element subluck = doc.createElement("subluck");
+        subluck.appendChild(doc.createTextNode("0"));
+        giveaway.appendChild(subluck);
+        root.appendChild(giveaway);
         Element access_token = doc.createElement("access_token");
         access_token.appendChild(doc.createTextNode("null"));
         root.appendChild(access_token);

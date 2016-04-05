@@ -1,10 +1,12 @@
 package com.fantasia.controller;
 
 import com.fantasia.Context;
+import com.fantasia.TabManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -58,7 +60,7 @@ public class CommandController implements Initializable {
             if(commandList.getSelectionModel().getSelectedItem() != null){
                 Context.getInstance().setSelectedCommand(commandList.getSelectionModel().getSelectedItem().toString());
                 try{
-                    Context.getInstance().switchTo("edit");
+                    TabManager.getInstance().getCommands().setContent(FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/edit.fxml")));
                 } catch (Exception ex){
                     ex.printStackTrace();
                 }
@@ -66,12 +68,11 @@ public class CommandController implements Initializable {
         });
         addCommand.setOnAction(ae -> {
             try{
-                Context.getInstance().switchTo("add");
+                TabManager.getInstance().getCommands().setContent(FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/add.fxml")));
             } catch (Exception ex){
                 ex.printStackTrace();
             }
         });
-
         exportCommands.setOnAction(ae -> {
             try {
                 exportCommands();

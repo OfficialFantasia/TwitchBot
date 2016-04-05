@@ -18,6 +18,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/update.fxml"));
         primaryStage.setTitle("TwitchBot");
+        primaryStage.setResizable(false);
         primaryStage.setScene(new Scene(root, 354, 227));
         primaryStage.show();
         Context.getInstance().setStage(primaryStage);

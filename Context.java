@@ -1,8 +1,6 @@
 package com.fantasia;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
@@ -12,6 +10,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Hours;
 import org.joda.time.Minutes;
+import org.joda.time.chrono.StrictChronology;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -27,17 +26,19 @@ public class Context {
         return instance;
     }
 
-    private String access_token,channel,selectedCommand,title,game,giveawayCommand;
+    private String access_token,channel,selectedCommand,title,game,giveawayCommand,winner;
     private int viewers;
     private BufferedReader inputStream;
     private BufferedWriter outputStream;
     private HashMap<String, String> commands = new HashMap<>();
     private List<String> giveawayEntries = new ArrayList<>();
+    private List<String> moderators = new ArrayList<>();
+    private List<String> subs = new ArrayList<>();
     private String[] vars = {"%NICK%", "%HOURS%", "%MINUTES%"};
-    private boolean autoSaveEnabled,running,partner,live;
+    private boolean autoSaveEnabled,running,partner,live,modsCanWin,onlySubsAndMods;
     private DateTime startedAt;
     private Timer timer;
-    private final double VERSION = 2;
+    private final double VERSION = 2.1;
     private ListView giveawayEntriesList;
     protected Stage stage;
 
@@ -69,15 +70,15 @@ public class Context {
         return autoSaveEnabled;
     }
 
-    public String getCommandsFile() throws Exception {
+    public String getCommandsFile(){
         return System.getProperty("user.home") + "/TwitchBotDocuments/commands.xml";
     }
 
-    public String getOptionsFile() throws Exception {
+    public String getOptionsFile(){
         return System.getProperty("user.home") + "/TwitchBotDocuments/options.xml";
     }
 
-    public String getFilePath() throws Exception {
+    public String getFilePath(){
         return System.getProperty("user.home") + "/TwitchBotDocuments/";
     }
 
@@ -139,6 +140,26 @@ public class Context {
 
     public Stage getStage() {
         return stage;
+    }
+
+    public String getWinner() {
+        return winner;
+    }
+
+    public List<String> getModerators() {
+        return moderators;
+    }
+
+    public boolean isModsCanWin() {
+        return modsCanWin;
+    }
+
+    public boolean isOnlySubsAndMods() {
+        return onlySubsAndMods;
+    }
+
+    public List<String> getSubs() {
+        return subs;
     }
 
     public void setAccess_token(String access_token) {
@@ -206,10 +227,26 @@ public class Context {
         this.stage = stage;
     }
 
+    public void setWinner(String winner) {
+        this.winner = winner;
+    }
+
+    public void setModsCanWin(boolean modsCanWin) {
+        this.modsCanWin = modsCanWin;
+    }
+
+    public void setOnlySubsAndMods(boolean onlySubsAndMods) {
+        this.onlySubsAndMods = onlySubsAndMods;
+    }
+
     //frequently used
-    public void sendMessage(String msg) throws Exception{
-        outputStream.write("PRIVMSG #" + Context.getInstance().getChannel() + " :" + msg + " \r\n");
-        outputStream.flush();
+    public void sendMessage(String msg){
+        try {
+            outputStream.write("PRIVMSG #" + Context.getInstance().getChannel() + " :" + msg + " \r\n");
+            outputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void switchToCommandsTab(){
@@ -223,10 +260,15 @@ public class Context {
         }
     }
 
-    public void switchTo(String destination) throws IOException {
-        Parent channel = FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/" + destination + ".fxml"));
-        stage.setScene(new Scene(channel,354,227));
-        stage.show();
+    public void switchTo(String destination){
+        Parent channel = null;
+        try {
+            channel = FXMLLoader.load(getClass().getResource("/com/fantasia/scenes/" + destination + ".fxml"));
+            stage.setScene(new Scene(channel,354,227));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void startTimer(TimerTask task){

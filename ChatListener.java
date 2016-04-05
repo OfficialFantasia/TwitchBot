@@ -1,6 +1,5 @@
 package com.fantasia;
 
-import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -78,9 +77,8 @@ public class ChatListener implements Runnable {
     private String getCommand(String msg){
         if(!Context.getInstance().getCommands().isEmpty()){
             for(String c: Context.getInstance().getCommands().keySet()){
-                if(msg.contains(c.replace("%ARG%",""))){
+                if(msg.contains(c))
                     return c;
-                }
             }
         }
         return "";

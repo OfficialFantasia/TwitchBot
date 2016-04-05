@@ -6,30 +6,26 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.text.Font?>
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="198.0" prefWidth="354.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fantasia.controller.InformationController">
    <children>
       <Label layoutX="14.0" layoutY="20.0" text="Title:" />
       <Label layoutX="14.0" layoutY="56.0" text="Game:" />
-      <TextField fx:id="title" layoutX="96.0" layoutY="16.0" prefHeight="25.0" prefWidth="235.0" />
-      <TextField fx:id="game" layoutX="96.0" layoutY="52.0" prefHeight="25.0" prefWidth="235.0" />
+      <TextField fx:id="title" layoutX="96.0" layoutY="16.0" prefHeight="25.0" prefWidth="244.0" />
+      <TextField fx:id="game" layoutX="96.0" layoutY="52.0" prefHeight="25.0" prefWidth="244.0" />
       <Label layoutX="14.0" layoutY="93.0" text="Viewers:" />
       <Label fx:id="viewers" layoutX="98.0" layoutY="93.0" text="0" />
       <Label layoutX="15.0" layoutY="128.0" prefHeight="17.0" prefWidth="40.0" text="Status:" />
       <Label fx:id="streamStatus" layoutX="98.0" layoutY="128.0" text="Not live" />
-      <Label layoutX="152.0" layoutY="156.0" prefHeight="28.0" prefWidth="195.0" text="Twitch Api needs some time to save changes, you're title and game might change after saving" textFill="RED" wrapText="true">
-         <font>
-            <Font size="9.0" />
-         </font>
-      </Label>
-      <ImageView fx:id="spinner" fitHeight="16.0" fitWidth="16.0" layoutX="7.0" layoutY="176.0" pickOnBounds="true" preserveRatio="true" visible="false">
+      <ImageView fx:id="spinner" fitHeight="16.0" fitWidth="16.0" layoutX="19.0" layoutY="169.0" pickOnBounds="true" preserveRatio="true" visible="false">
          <image>
             <Image url="@../res/spinner.gif" />
          </image>
       </ImageView>
-      <Button fx:id="saveTitle" layoutX="287.0" layoutY="16.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="44.0" text="Save" visible="false" />
-      <Button fx:id="saveGame" layoutX="287.0" layoutY="52.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="44.0" text="Save" visible="false" />
-      <Label fx:id="infoLabel" layoutX="27.0" layoutY="176.0" prefHeight="17.0" prefWidth="126.0" text="Updating Stream infos" visible="false" />
+      <Button fx:id="saveTitle" layoutX="296.0" layoutY="16.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="44.0" text="Save" visible="false" />
+      <Button fx:id="saveGame" layoutX="296.0" layoutY="52.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="44.0" text="Save" visible="false" />
+      <Label fx:id="infoLabel" layoutX="41.0" layoutY="169.0" prefHeight="17.0" prefWidth="126.0" text="Updating Stream infos" visible="false" />
+      <Button fx:id="preview" disable="true" layoutX="241.0" layoutY="164.0" maxHeight="-Infinity" mnemonicParsing="false" prefHeight="25.0" prefWidth="99.0" text="Preview Image" />
+      <Button fx:id="showMods" disable="true" layoutX="241.0" layoutY="137.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="99.0" text="Mods &amp; Subs" />
    </children>
 </Pane>

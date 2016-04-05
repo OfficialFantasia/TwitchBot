@@ -44,13 +44,7 @@ public class UpdateController implements Initializable {
             }
             System.exit(0);
         });
-        cancel.setOnAction(ae -> {
-            try {
-                Context.getInstance().switchTo("login");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        cancel.setOnAction(ae -> Context.getInstance().switchTo("login"));
         try {
             checkForUpdate();
         } catch (Exception e) {
@@ -83,11 +77,7 @@ public class UpdateController implements Initializable {
             });
         } else {
             Platform.runLater(() -> {
-                try {
-                    Context.getInstance().switchTo("login");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                Context.getInstance().switchTo("login");
             });
         }
     }

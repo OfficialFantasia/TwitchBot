@@ -22,8 +22,6 @@ public class ControlsController implements Initializable{
     @FXML
     public Button ban,timeout,unban;
 
-    private boolean disabled;
-
     final static protected ControlsController instance = new ControlsController();
     public static ControlsController getInstance() {
         return instance;
@@ -99,19 +97,15 @@ public class ControlsController implements Initializable{
                 }
             }
         });
-        toggleSlow.setDisable(disabled);
+        toggleSlow.setDisable(!Context.getInstance().isLive());
         toggleSub.setDisable(!Context.getInstance().isPartner());
         if(!Context.getInstance().isPartner())
-            subStatus.setText("not partnered");
-        ban.setDisable(disabled);
-        banInput.setDisable(disabled);
-        timeout.setDisable(disabled);
-        timeoutInput.setDisable(disabled);
-        unban.setDisable(disabled);
-        unbanInput.setDisable(disabled);
-    }
-
-    public void setDisabled(boolean disabled){
-        this.disabled = disabled;
+            subStatus.setText("Not partnered");
+        ban.setDisable(!Context.getInstance().isLive());
+        banInput.setDisable(!Context.getInstance().isLive());
+        timeout.setDisable(!Context.getInstance().isLive());
+        timeoutInput.setDisable(!Context.getInstance().isLive());
+        unban.setDisable(!Context.getInstance().isLive());
+        unbanInput.setDisable(!Context.getInstance().isLive());
     }
 }
